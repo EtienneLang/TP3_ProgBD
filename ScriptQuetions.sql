@@ -2,6 +2,7 @@ SET SERVEROUTPUT ON;
 ----------------
 -- Question 1 -- 
 ----------------
+-- MANQUE ROLLBACK
 CREATE OR REPLACE PROCEDURE max8_photos_PRC
 IS
     CURSOR cur_photos IS
@@ -34,8 +35,6 @@ BEGIN
     END LOOP;
 END;
 
-EXEC max8_photos_prc;
-
 
 
 ----------------
@@ -57,25 +56,30 @@ END;
 
 
 
--- POUR TESTER QUESTION 2 --
-DECLARE
-    my_cursor SYS_REFCURSOR;
-    v_utilisateurid annonces.utilisateurid%TYPE;
-    v_RESERVATION annonces.utilisateurid%TYPE;
-BEGIN
-    my_cursor := obtenir_annonces_reservations(3);
-
-    LOOP
-        FETCH my_cursor INTO v_utilisateurid,v_RESERVATION;
-        EXIT WHEN my_cursor%NOTFOUND;
-        DBMS_OUTPUT.PUT_LINE(v_utilisateurid|| ', ' || v_RESERVATION);
-    END LOOP;
-
-    CLOSE my_cursor;
-END;
 ----------------
 -- Question 3 -- 
 ----------------
+-- MANQUE ROLLBACK
+CREATE OR REPLACE PROCEDURE SUPPRIMER_COMMENTAIRES_OBSOLETES_PRC(i_date_limite DATE)
+IS
+CURSOR cur_commentaires (
+    date_limite DATE
+)
+    IS
+        SELECT * FROM commentaires WHERE datecommentaire > i_date_limite;
+    rec_commentaires cur_commentaires%ROWTYPE;
+BEGIN
+    OPEN cur_commentaires(i_date_limite);
+    LOOP
+        FETCH cur_commentaires INTO rec_commentaires;
+        EXIT WHEN cur_commentaires%notfound;
+        
+        DELETE FROM commentaires
+        WHERE commentaireid = rec_commentaires.commentaireid; 
+    END LOOP;
+END;
+
+
 
 ----------------
 -- Question 4 -- 
