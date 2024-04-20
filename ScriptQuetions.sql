@@ -35,10 +35,44 @@ BEGIN
 END;
 
 EXEC max8_photos_prc;
+
+
+
 ----------------
 -- Question 2 -- 
 ----------------
+CREATE OR REPLACE FUNCTION obtenir_annonces_reservations_FCT(i_utilisateur_id NUMBER)
+RETURN SYS_REFCURSOR
+IS 
+    cur_annonces SYS_REFCURSOR;
+BEGIN
+    OPEN cur_annonces FOR
+        SELECT annonces.utilisateurid, COUNT(reservations.reservationid) AS NumberOfReservations
+        FROM annonces 
+        JOIN reservations ON reservations.utilisateurid = annonces.utilisateurid
+        WHERE annonces.utilisateurid = i_utilisateur_id AND reservations.statut = 'confirmée'
+        GROUP BY annonces.utilisateurid;
+    RETURN cur_annonces;
+END;
 
+
+
+-- POUR TESTER QUESTION 2 --
+DECLARE
+    my_cursor SYS_REFCURSOR;
+    v_utilisateurid annonces.utilisateurid%TYPE;
+    v_RESERVATION annonces.utilisateurid%TYPE;
+BEGIN
+    my_cursor := obtenir_annonces_reservations(3);
+
+    LOOP
+        FETCH my_cursor INTO v_utilisateurid,v_RESERVATION;
+        EXIT WHEN my_cursor%NOTFOUND;
+        DBMS_OUTPUT.PUT_LINE(v_utilisateurid|| ', ' || v_RESERVATION);
+    END LOOP;
+
+    CLOSE my_cursor;
+END;
 ----------------
 -- Question 3 -- 
 ----------------
