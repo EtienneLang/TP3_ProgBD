@@ -85,6 +85,22 @@ END;
 -- Question 4 -- 
 ----------------
 
+CREATE OR REPLACE PROCEDURE Q4_TRAITER_RESERVATION(i_user_id IN NUMBER) 
+IS
+    CURSOR cur_reservations(user_id NUMBER) IS
+        SELECT * FROM reservations WHERE utilisateurid = user_id AND statut != 'traitée' FOR UPDATE OF statut;
+    rec_reservation reservations%ROWTYPE;
+BEGIN
+    OPEN cur_reservations(i_user_id);
+    LOOP
+        FETCH cur_reservations INTO rec_reservation;
+        EXIT WHEN cur_reservations%NOTFOUND;
+        UPDATE reservations SET statut = 'Traitée' WHERE CURRENT OF cur_reservations;
+    END LOOP;
+    DBMS_OUTPUT.PUT_LINE(cur_reservations%ROWCOUNT || ' réservation(s) traitée(s)');
+    CLOSE cur_reservations;
+END;
+
 ----------------
 -- Question 5 -- 
 ----------------
