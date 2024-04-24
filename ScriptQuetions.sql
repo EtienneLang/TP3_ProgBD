@@ -1,4 +1,5 @@
 SET SERVEROUTPUT ON;
+/
 ----------------
 -- Question 1 -- 
 ----------------
@@ -34,7 +35,7 @@ BEGIN
         v_id_annonce_precedent := rec_photos.annonceid;
     END LOOP;
 END;
-
+/
 
 
 ----------------
@@ -53,7 +54,7 @@ BEGIN
         GROUP BY annonces.utilisateurid;
     RETURN cur_annonces;
 END;
-
+/
 
 
 ----------------
@@ -78,7 +79,7 @@ BEGIN
         WHERE commentaireid = rec_commentaires.commentaireid; 
     END LOOP;
 END;
-
+/
 
 
 ----------------
@@ -100,11 +101,30 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE(cur_reservations%ROWCOUNT || ' réservation(s) traitée(s)');
     CLOSE cur_reservations;
 END;
-
+/
 ----------------
 -- Question 5 -- 
 ----------------
+CREATE SEQUENCE no_img_seq
+    START WITH 1
+    INCREMENT BY 1
+    MAXVALUE 9999
+    NOCYCLE
+    CACHE 5;
+/
 
+CREATE OR REPLACE TRIGGER Q5_URL_PHOTO_AI_TRG BEFORE INSERT ON photos
+FOR EACH ROW
+DECLARE
+    v_base_url VARCHAR2(100) := 'CNCIMG';
+BEGIN
+    :NEW.urlphoto := v_base_url || LPAD(no_img_seq.NEXTVAL, 5, '0');
+END;
+/
+
+INSERT INTO Photos (PhotoID, AnnonceID, URLPhoto, Description) VALUES 
+(10, 1, 'photo1.jpg', 'Vue depuis la fenêtre du salon');
+/
 ----------------
 -- Question 6 -- 
 ----------------
