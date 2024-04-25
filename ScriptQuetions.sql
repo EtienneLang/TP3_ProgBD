@@ -1,39 +1,37 @@
 SET SERVEROUTPUT ON;
-/
+
 ----------------
 -- Question 1 -- 
 ----------------
 -- MANQUE ROLLBACK
-CREATE OR REPLACE PROCEDURE max8_photos_PRC
+CREATE OR REPLACE PROCEDURE Q1_MAX8_PHOTOS_PRC
 IS
-    CURSOR cur_photos IS
-       -- SELECT annonceid, COUNT(*) as nb_photos FROM photos GROUP BY annonceid;
-       SELECT annonceid, photoid FROM photos;
-    rec_photos cur_photos%ROWTYPE;
-    v_nombre_ligne NUMBER;
-    v_photo_compteur NUMBER;
-    v_id_annonce_precedent NUMBER;
-    
+    CURSOR cur_annonces IS 
+        SELECT * FROM annonces;
+    rec_annonce annonces%ROWTYPE;    
+    CURSOR cur_photos(annonce_id NUMBER) IS
+       SELECT * FROM photos WHERE annonceid = annonce_id;
+    rec_photo photos%ROWTYPE;
+    c_max_photos NUMBER := 8;
 BEGIN
-    OPEN cur_photos;
-    v_photo_compteur := 0;
+    OPEN cur_annonces;
     LOOP
-        FETCH cur_photos INTO rec_photos;
-        EXIT WHEN cur_photos%notfound;
-        -- On regarde si c'est la même annonce que celle qu'on viens de boucler
-        IF rec_photos.annonceid = v_id_annonce_precedent THEN
-            v_photo_compteur := v_photo_compteur + 1;
-        ELSE
-            v_photo_compteur := 0;
-        END IF;
-        IF v_photo_compteur > 8 THEN
-            -- Ici on pourrais utiliser le %ROWNUMBER pour aller supprimer directement a la ligne, 
-            -- je ne sais pas ou on pourrais l'utiliser ailleur.
-            DELETE FROM photos
-            WHERE photoid = rec_photos.photoid;
-        END IF;
-        v_id_annonce_precedent := rec_photos.annonceid;
+        DBMS_OUTPUT.PUT_LINE('looped on one annonce');
+        FETCH cur_annonces INTO rec_annonce;
+        EXIT WHEN cur_annonces%NOTFOUND;
+        OPEN cur_photos(rec_annonce.annonceid);
+        LOOP
+            FETCH cur_photos INTO rec_photo;
+            EXIT WHEN cur_photos%NOTFOUND;
+            IF cur_photos%ROWCOUNT > c_max_photos THEN
+                DBMS_OUTPUT.PUT_LINE('Photo supprimé');
+                DELETE FROM photos WHERE photoid = rec_photo.photoid;
+            END IF;
+        END LOOP;    
+        CLOSE cur_photos;
+        COMMIT;
     END LOOP;
+    CLOSE cur_annonces;
 END;
 /
 
@@ -50,7 +48,7 @@ BEGIN
         SELECT annonces.utilisateurid, COUNT(reservations.reservationid) AS NumberOfReservations
         FROM annonces 
         JOIN reservations ON reservations.utilisateurid = annonces.utilisateurid
-        WHERE annonces.utilisateurid = i_utilisateur_id AND reservations.statut = 'confirmée'
+        WHERE annonces.utilisateurid = i_utilisateur_id AND reservations.statut = 'confirmï¿½e'
         GROUP BY annonces.utilisateurid;
     RETURN cur_annonces;
 END;
@@ -85,20 +83,19 @@ END;
 ----------------
 -- Question 4 -- 
 ----------------
-
-CREATE OR REPLACE PROCEDURE Q4_TRAITER_RESERVATION(i_user_id IN NUMBER) 
+CREATE OR REPLACE PROCEDURE Q4_TRAITER_RESERVATION_PRC(i_user_id IN NUMBER) 
 IS
     CURSOR cur_reservations(user_id NUMBER) IS
-        SELECT * FROM reservations WHERE utilisateurid = user_id AND statut != 'traitée' FOR UPDATE OF statut;
+        SELECT * FROM reservations WHERE utilisateurid = user_id AND statut != 'traitï¿½e' FOR UPDATE OF statut;
     rec_reservation reservations%ROWTYPE;
 BEGIN
     OPEN cur_reservations(i_user_id);
     LOOP
         FETCH cur_reservations INTO rec_reservation;
         EXIT WHEN cur_reservations%NOTFOUND;
-        UPDATE reservations SET statut = 'Traitée' WHERE CURRENT OF cur_reservations;
+        UPDATE reservations SET statut = 'Traitï¿½e' WHERE CURRENT OF cur_reservations;
     END LOOP;
-    DBMS_OUTPUT.PUT_LINE(cur_reservations%ROWCOUNT || ' réservation(s) traitée(s)');
+    DBMS_OUTPUT.PUT_LINE(cur_reservations%ROWCOUNT || ' rï¿½servation(s) traitï¿½e(s)');
     CLOSE cur_reservations;
 END;
 /
@@ -113,17 +110,13 @@ CREATE SEQUENCE no_img_seq
     CACHE 5;
 /
 
-CREATE OR REPLACE TRIGGER Q5_URL_PHOTO_AI_TRG BEFORE INSERT ON photos
+CREATE OR REPLACE TRIGGER Q5_URL_PHOTO_BI_TRG BEFORE INSERT ON photos
 FOR EACH ROW
 DECLARE
     v_base_url VARCHAR2(100) := 'CNCIMG';
 BEGIN
     :NEW.urlphoto := v_base_url || LPAD(no_img_seq.NEXTVAL, 5, '0');
 END;
-/
-
-INSERT INTO Photos (PhotoID, AnnonceID, URLPhoto, Description) VALUES 
-(10, 1, 'photo1.jpg', 'Vue depuis la fenêtre du salon');
 /
 ----------------
 -- Question 6 -- 

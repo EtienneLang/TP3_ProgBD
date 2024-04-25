@@ -144,6 +144,29 @@ INSERT INTO Photos (PhotoID, AnnonceID, URLPhoto, Description) VALUES
 INSERT INTO Photos (PhotoID, AnnonceID, URLPhoto, Description) VALUES 
 (9, 5, 'photo9.jpg', 'Vue depuis le balcon');
 
+INSERT INTO Photos (PhotoID, AnnonceID, URLPhoto, Description) VALUES 
+(11, 1, 'photo1.jpg', 'Vue depuis la fenêtre du salon');
+
+INSERT INTO Photos (PhotoID, AnnonceID, URLPhoto, Description) VALUES 
+(12, 1, 'photo1.jpg', 'Vue depuis la fenêtre du salon');
+
+INSERT INTO Photos (PhotoID, AnnonceID, URLPhoto, Description) VALUES 
+(13, 1, 'photo1.jpg', 'Vue depuis la fenêtre du salon');
+
+INSERT INTO Photos (PhotoID, AnnonceID, URLPhoto, Description) VALUES 
+(14, 1, 'photo1.jpg', 'Vue depuis la fenêtre du salon');
+
+INSERT INTO Photos (PhotoID, AnnonceID, URLPhoto, Description) VALUES 
+(15, 1, 'photo1.jpg', 'Vue depuis la fenêtre du salon');
+
+INSERT INTO Photos (PhotoID, AnnonceID, URLPhoto, Description) VALUES 
+(16, 1, 'photo1.jpg', 'Vue depuis la fenêtre du salon');
+
+INSERT INTO Photos (PhotoID, AnnonceID, URLPhoto, Description) VALUES 
+(17, 1, 'photo1.jpg', 'Vue depuis la fenêtre du salon');
+
+INSERT INTO Photos (PhotoID, AnnonceID, URLPhoto, Description) VALUES 
+(18, 1, 'photo1.jpg', 'Vue depuis la fenêtre du salon');
 -- Insertion des données dans la table Messages
 INSERT INTO Messages (MessageID, ExpediteurUtilisateurID, DestinataireUtilisateurID, Contenu, DateEnvoi) VALUES 
 (1, 2, 1, 'Bonjour Jean, intéressé par votre appartement. Modalités de location à discuter ?', TIMESTAMP '2024-04-15 08:30:00');
