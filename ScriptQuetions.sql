@@ -122,3 +122,46 @@ END;
 -- Question 6 -- 
 ----------------
 
+-- ON VA DEVOIR TROUVER UN MOYEN D'AFFICHER L'ID D'UNE ANNONCE MEME QUAND ON LA SUPPRIME,
+-- POUR L'INSTANT C'EST IMPOSSIBLE CAR FOREINGKEY
+
+CREATE OR REPLACE TRIGGER Q6_JOURNALISATION_ANNONCE_AU_TRG
+AFTER INSERT OR UPDATE OR DELETE ON annonces
+FOR EACH ROW
+DECLARE
+    v_type VARCHAR2(20);
+    v_ancienne_valeur VARCHAR2(4000 BYTE);
+    v_nouvelle_valeur VARCHAR2(4000 BYTE);
+BEGIN
+    v_type := CASE
+        WHEN UPDATING THEN 'Updated' 
+        WHEN INSERTING THEN 'Inserted'
+        WHEN DELETING THEN 'Deleted'
+    END;
+    
+    IF UPDATING THEN
+        v_ancienne_valeur := :OLD.titre || ', ' || :OLD.description || ', ' || :OLD.prixparnuit;
+        v_nouvelle_valeur := :NEW.titre || ', ' || :NEW.description || ', ' || :NEW.prixparnuit;
+    ELSIF INSERTING THEN
+        v_ancienne_valeur := null;
+        v_nouvelle_valeur := :NEW.titre || ', ' || :NEW.description || ', ' || :NEW.prixparnuit;
+    ELSIF DELETING THEN
+        v_ancienne_valeur := :OLD.titre || ', ' || :OLD.description || ', ' || :OLD.prixparnuit;
+        v_nouvelle_valeur := null;
+    END IF;
+    
+    INSERT INTO operations_journal_annonce (
+        TYPE_OPERATION,
+        UTILISATEURORACLE,
+        DATEOPERATION,
+        ANCIENNE_VALEUR,
+        NOUVELLE_VALEUR
+    ) VALUES (
+        v_type,
+        USER,
+        SYSDATE,
+        v_ancienne_valeur,
+        v_nouvelle_valeur
+    );
+END;
+

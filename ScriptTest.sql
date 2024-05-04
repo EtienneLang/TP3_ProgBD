@@ -40,4 +40,17 @@ EXEC supprimer_commentaires_obsoletes_prc('24-04-06');
 ----------------
 -- Question 6 -- 
 ----------------
+BEGIN
+    UPDATE annonces
+    SET titre = 'bonjour'
+    WHERE annonceid = 1;
+END;
+
+INSERT INTO annonces (annonceid, utilisateurid, titre, description, prixparnuit, localisation)
+VALUES (123, 1, 'zaza', 'zouzou', 12, 'Quebec');
+
+
+DELETE FROM annonces
+WHERE annonceid = 123;
+
 
