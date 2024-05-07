@@ -16,20 +16,26 @@ IS
 BEGIN
     OPEN cur_annonces;
     LOOP
-        DBMS_OUTPUT.PUT_LINE('looped on one annonce');
-        FETCH cur_annonces INTO rec_annonce;
-        EXIT WHEN cur_annonces%NOTFOUND;
-        OPEN cur_photos(rec_annonce.annonceid);
-        LOOP
-            FETCH cur_photos INTO rec_photo;
-            EXIT WHEN cur_photos%NOTFOUND;
-            IF cur_photos%ROWCOUNT > c_max_photos THEN
-                DBMS_OUTPUT.PUT_LINE('Photo supprimé');
-                DELETE FROM photos WHERE photoid = rec_photo.photoid;
-            END IF;
-        END LOOP;    
-        CLOSE cur_photos;
-        COMMIT;
+        BEGIN
+            DBMS_OUTPUT.PUT_LINE('looped on one annonce');
+            FETCH cur_annonces INTO rec_annonce;
+            EXIT WHEN cur_annonces%NOTFOUND;
+            OPEN cur_photos(rec_annonce.annonceid);
+            LOOP
+                    FETCH cur_photos INTO rec_photo;
+                    EXIT WHEN cur_photos%NOTFOUND;
+                    IF cur_photos%ROWCOUNT > c_max_photos THEN
+                        DBMS_OUTPUT.PUT_LINE('Photo supprimé');
+                        DELETE FROM photos WHERE photoid = rec_photo.photoid;
+                    END IF;
+               
+            END LOOP;    
+            CLOSE cur_photos;
+            COMMIT;
+         EXCEPTION
+            WHEN OTHERS THEN
+                ROLLBACK;
+        END;
     END LOOP;
     CLOSE cur_annonces;
 END;
@@ -70,12 +76,20 @@ CURSOR cur_commentaires (
 BEGIN
     OPEN cur_commentaires(i_date_limite);
     LOOP
-        FETCH cur_commentaires INTO rec_commentaires;
-        EXIT WHEN cur_commentaires%notfound;
+        BEGIN
+            FETCH cur_commentaires INTO rec_commentaires;
+            EXIT WHEN cur_commentaires%notfound;
         
-        DELETE FROM commentaires
-        WHERE commentaireid = rec_commentaires.commentaireid; 
+            DELETE FROM commentaires
+            WHERE commentaireid = rec_commentaires.commentaireid;
+            
+            COMMIT;
+        EXCEPTION
+            WHEN OTHERS THEN
+                ROLLBACK;
+        END;
     END LOOP;
+    CLOSE cur_commentaires;
 END;
 /
 
