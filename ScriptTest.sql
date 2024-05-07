@@ -47,10 +47,10 @@ BEGIN
 END;
 
 INSERT INTO annonces (annonceid, utilisateurid, titre, description, prixparnuit, localisation)
-VALUES (123, 1, 'zaza', 'zouzou', 12, 'Quebec');
+VALUES (124, 1, 'zaza', 'zouzou', 12, 'Quebec');
 
 
 DELETE FROM annonces
-WHERE annonceid = 123;
+WHERE annonceid = 124;
 
 
